@@ -2,17 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
-		log.Printf("Defaulting to port %s", port)
 	}
 
 	r := gin.Default()
