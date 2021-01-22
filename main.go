@@ -13,6 +13,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var redirectMap = map[string]string{
+	"/":   "https://ja.wikipedia.org/wiki/%E7%A0%82%E7%B3%96",
+	"/an": "https://anilist.co/character/126754/Satou-Matsuzaka",
+	"/vi": "https://vi.satou.ch/",
+}
+
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -23,11 +29,14 @@ func main() {
 	r.AppEngine = true
 	gin.SetMode(gin.ReleaseMode)
 
-	r.GET("/", func(c *gin.Context) {
-		c.Redirect(http.StatusFound, "https://ja.wikipedia.org/wiki/%E7%A0%82%E7%B3%96")
-	})
-	r.GET("/an", func(c *gin.Context) {
-		c.Redirect(http.StatusFound, "https://myanimelist.net/character/134256/Satou_Matsuzaka")
+	r.GET("/*path", func(c *gin.Context) {
+		path := c.Param("path")
+		dest, ok := redirectMap[path]
+		if !ok {
+			c.Data(http.StatusNotFound, "text/plain", []byte("not found"))
+			return
+		}
+		c.Redirect(http.StatusFound, dest)
 	})
 
 	server := &http.Server{
